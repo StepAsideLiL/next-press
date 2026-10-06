@@ -1,4 +1,5 @@
 import { drizzle } from "drizzle-orm/postgres-js";
+import { relations } from "@/lib/db/relations";
 import {
   account,
   commentmeta,
@@ -7,7 +8,6 @@ import {
   options,
   postmeta,
   posts,
-  relations,
   schema,
   session,
   termmeta,
@@ -19,4 +19,4 @@ import {
   verification,
 } from "@/lib/db/schema";
 
-export const db = drizzle(process.env.DATABASE_URL!);
+export const db = drizzle(process.env.DATABASE_URL!, { relations });
