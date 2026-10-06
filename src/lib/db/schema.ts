@@ -1,14 +1,14 @@
-import {
-  pgTable,
-  bigserial,
-  varchar,
-  text,
-  integer,
-  timestamp,
-  bigint,
-  boolean,
-} from "drizzle-orm/pg-core";
 import { defineRelations } from "drizzle-orm";
+import {
+  bigint,
+  bigserial,
+  boolean,
+  integer,
+  pgTable,
+  text,
+  timestamp,
+  varchar,
+} from "drizzle-orm/pg-core";
 
 // 1. Better Auth Core User Table (adapted from users)
 export const user = pgTable("user", {
