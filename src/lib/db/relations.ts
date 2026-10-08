@@ -54,11 +54,11 @@ export const relations = defineRelations(schema, (r) => ({
 
   terms: {
     termmeta: r.many.termmeta({
-      from: r.terms.termId,
+      from: r.terms.id,
       to: r.termmeta.termId,
     }),
     termTaxonomies: r.many.termTaxonomy({
-      from: r.terms.termId,
+      from: r.terms.id,
       to: r.termTaxonomy.termId,
     }),
   },
@@ -66,14 +66,14 @@ export const relations = defineRelations(schema, (r) => ({
   termmeta: {
     term: r.one.terms({
       from: r.termmeta.termId,
-      to: r.terms.termId,
+      to: r.terms.id,
     }),
   },
 
   termTaxonomy: {
     term: r.one.terms({
       from: r.termTaxonomy.termId,
-      to: r.terms.termId,
+      to: r.terms.id,
     }),
     posts: r.many.posts({
       from: r.termTaxonomy.termTaxonomyId.through(
@@ -104,7 +104,7 @@ export const relations = defineRelations(schema, (r) => ({
       to: r.users.id,
     }),
     commentmeta: r.many.commentmeta({
-      from: r.comments.commentId,
+      from: r.comments.id,
       to: r.commentmeta.commentId,
     }),
   },
@@ -112,7 +112,7 @@ export const relations = defineRelations(schema, (r) => ({
   commentmeta: {
     comment: r.one.comments({
       from: r.commentmeta.commentId,
-      to: r.comments.commentId,
+      to: r.comments.id,
     }),
   },
 }));

@@ -11,7 +11,7 @@ import {
 
 // 1. Better Auth Core User Table (adapted from users)
 export const users = pgTable("users", {
-  id: text("id").primaryKey(), // Better Auth uses string IDs (cuid/uuid)
+  id: bigserial("id", { mode: "number" }).primaryKey(), // Better Auth uses string IDs (cuid/uuid)
   name: text("name").notNull(), // Mapped from display_name or user_nicename
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").notNull().default(false),
@@ -32,8 +32,8 @@ export const users = pgTable("users", {
 
 // 2. Better Auth Session Table
 export const session = pgTable("session", {
-  id: text("id").primaryKey(),
-  userId: text("user_id")
+  id: bigserial("id", { mode: "number" }).primaryKey(),
+  userId: bigint("user_id", { mode: "number" })
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   token: text("token").notNull().unique(),
@@ -46,8 +46,8 @@ export const session = pgTable("session", {
 
 // 3. Better Auth Account Table (Required for credentials / OAuth mapping)
 export const account = pgTable("account", {
-  id: text("id").primaryKey(),
-  userId: text("user_id")
+  id: bigserial("id", { mode: "number" }).primaryKey(),
+  userId: bigint("user_id", { mode: "number" })
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   accountId: text("account_id").notNull(),
@@ -65,7 +65,7 @@ export const account = pgTable("account", {
 
 // 4. Better Auth Verification Table (For email verification / password resets)
 export const verification = pgTable("verification", {
-  id: text("id").primaryKey(),
+  id: bigserial("id", { mode: "number" }).primaryKey(),
   identifier: text("identifier").notNull(),
   value: text("value").notNull(),
   expiresAt: timestamp("expires_at").notNull(),
@@ -75,9 +75,9 @@ export const verification = pgTable("verification", {
 
 // 5. WordPress Usermeta (Retained to support plugin compatibility if needed)
 export const usermeta = pgTable("usermeta", {
-  umetaId: bigserial("umeta_id", { mode: "number" }).primaryKey(),
+  id: bigserial("id", { mode: "number" }).primaryKey(),
   // Note: if you migrate fully to text IDs, you can change userId type to text
-  userId: text("user_id")
+  userId: bigint("user_id", { mode: "number" })
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   metaKey: varchar("meta_key", { length: 255 }),
@@ -86,7 +86,7 @@ export const usermeta = pgTable("usermeta", {
 
 // 3. posts[cite: 1]
 export const posts = pgTable("posts", {
-  id: bigserial("ID", { mode: "number" }).primaryKey(),
+  id: bigserial("id", { mode: "number" }).primaryKey(),
   postAuthor: bigint("post_author", { mode: "number" })
     .notNull()
     .references(() => users.id, { onDelete: "restrict" }),
@@ -123,7 +123,7 @@ export const posts = pgTable("posts", {
 
 // 4. postmeta[cite: 1]
 export const postmeta = pgTable("postmeta", {
-  metaId: bigserial("meta_id", { mode: "number" }).primaryKey(),
+  id: bigserial("id", { mode: "number" }).primaryKey(),
   postId: bigint("post_id", { mode: "number" })
     .notNull()
     .references(() => posts.id, { onDelete: "cascade" }),
@@ -133,7 +133,7 @@ export const postmeta = pgTable("postmeta", {
 
 // 5. terms[cite: 1]
 export const terms = pgTable("terms", {
-  termId: bigserial("term_id", { mode: "number" }).primaryKey(),
+  id: bigserial("id", { mode: "number" }).primaryKey(),
   name: varchar("name", { length: 200 }).notNull().default(""),
   slug: varchar("slug", { length: 200 }).notNull().default(""),
   termGroup: bigint("term_group", { mode: "number" }).notNull().default(0),
@@ -141,10 +141,10 @@ export const terms = pgTable("terms", {
 
 // 6. termmeta[cite: 1]
 export const termmeta = pgTable("termmeta", {
-  metaId: bigserial("meta_id", { mode: "number" }).primaryKey(),
+  id: bigserial("id", { mode: "number" }).primaryKey(),
   termId: bigint("term_id", { mode: "number" })
     .notNull()
-    .references(() => terms.termId, { onDelete: "cascade" }),
+    .references(() => terms.id, { onDelete: "cascade" }),
   metaKey: varchar("meta_key", { length: 255 }),
   metaValue: text("meta_value"),
 });
@@ -156,7 +156,7 @@ export const termTaxonomy = pgTable("term_taxonomy", {
   }).primaryKey(),
   termId: bigint("term_id", { mode: "number" })
     .notNull()
-    .references(() => terms.termId, { onDelete: "cascade" }),
+    .references(() => terms.id, { onDelete: "cascade" }),
   taxonomy: varchar("taxonomy", { length: 32 }).notNull().default(""),
   description: text("description").notNull(),
   parent: bigint("parent", { mode: "number" }).notNull().default(0),
@@ -176,7 +176,7 @@ export const termRelationships = pgTable("term_relationships", {
 
 // 9. comments[cite: 1]
 export const comments = pgTable("comments", {
-  commentId: bigserial("comment_ID", { mode: "number" }).primaryKey(),
+  id: bigserial("id", { mode: "number" }).primaryKey(),
   commentPostId: bigint("comment_post_ID", { mode: "number" })
     .notNull()
     .references(() => posts.id, { onDelete: "cascade" }),
@@ -211,36 +211,20 @@ export const comments = pgTable("comments", {
 
 // 10. commentmeta[cite: 1]
 export const commentmeta = pgTable("commentmeta", {
-  metaId: bigserial("meta_id", { mode: "number" }).primaryKey(),
+  id: bigserial("id", { mode: "number" }).primaryKey(),
   commentId: bigint("comment_id", { mode: "number" })
     .notNull()
-    .references(() => comments.commentId, { onDelete: "cascade" }),
+    .references(() => comments.id, { onDelete: "cascade" }),
   metaKey: varchar("meta_key", { length: 255 }),
   metaValue: text("meta_value"),
 });
 
 // 11. options[cite: 1]
 export const options = pgTable("options", {
-  optionId: bigserial("option_id", { mode: "number" }).primaryKey(),
+  id: bigserial("id", { mode: "number" }).primaryKey(),
   optionName: varchar("option_name", { length: 191 }).notNull().unique(),
   optionValue: text("option_value").notNull(),
   autoload: varchar("autoload", { length: 20 }).notNull().default("yes"),
-});
-
-// 12. links[cite: 1]
-export const links = pgTable("links", {
-  linkId: bigserial("link_id", { mode: "number" }).primaryKey(),
-  linkUrl: varchar("link_url", { length: 255 }).notNull().default(""),
-  linkName: varchar("link_name", { length: 255 }).notNull().default(""),
-  linkImage: varchar("link_image", { length: 255 }).notNull().default(""),
-  linkTarget: varchar("link_target", { length: 25 }).notNull().default(""),
-  linkVisible: varchar("link_visible", { length: 20 }).notNull().default("Y"),
-  linkOwner: bigint("link_owner", { mode: "number" }).notNull().default(1),
-  linkRating: integer("link_rating").notNull().default(0),
-  linkUpdated: timestamp("link_updated", { mode: "string" }).notNull(),
-  linkRel: varchar("link_rel", { length: 255 }).notNull().default(""),
-  linkNotes: text("link_notes").notNull(),
-  linkRss: varchar("link_rss", { length: 255 }).notNull().default(""),
 });
 
 export const schema = {
@@ -255,5 +239,4 @@ export const schema = {
   comments,
   commentmeta,
   options,
-  links,
 };
