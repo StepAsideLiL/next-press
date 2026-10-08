@@ -24,6 +24,7 @@
     "db:studio": "drizzle-kit studio --verbose --config drizzle.config.local.ts"
   },
   "dependencies": {
+    "@better-auth/drizzle-adapter": "^1.7.7",
     "better-auth": "^1.7.7",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.4.0",

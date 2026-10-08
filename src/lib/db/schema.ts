@@ -10,7 +10,7 @@ import {
 } from "drizzle-orm/pg-core";
 
 // 1. Better Auth Core User Table (adapted from users)
-export const user = pgTable("user", {
+export const users = pgTable("users", {
   id: text("id").primaryKey(), // Better Auth uses string IDs (cuid/uuid)
   name: text("name").notNull(), // Mapped from display_name or user_nicename
   email: text("email").notNull().unique(),
@@ -35,7 +35,7 @@ export const session = pgTable("session", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
+    .references(() => users.id, { onDelete: "cascade" }),
   token: text("token").notNull().unique(),
   expiresAt: timestamp("expires_at").notNull(),
   ipAddress: text("ip_address"),
@@ -49,7 +49,7 @@ export const account = pgTable("account", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
+    .references(() => users.id, { onDelete: "cascade" }),
   accountId: text("account_id").notNull(),
   providerId: text("provider_id").notNull(),
   accessToken: text("access_token"),
@@ -79,7 +79,7 @@ export const usermeta = pgTable("usermeta", {
   // Note: if you migrate fully to text IDs, you can change userId type to text
   userId: text("user_id")
     .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
+    .references(() => users.id, { onDelete: "cascade" }),
   metaKey: varchar("meta_key", { length: 255 }),
   metaValue: text("meta_value"),
 });
@@ -89,7 +89,7 @@ export const posts = pgTable("posts", {
   id: bigserial("ID", { mode: "number" }).primaryKey(),
   postAuthor: bigint("post_author", { mode: "number" })
     .notNull()
-    .references(() => user.id, { onDelete: "restrict" }),
+    .references(() => users.id, { onDelete: "restrict" }),
   postDate: timestamp("post_date", { mode: "string" }).notNull(),
   postDateGmt: timestamp("post_date_gmt", { mode: "string" }).notNull(),
   postContent: text("post_content").notNull(),
@@ -206,7 +206,7 @@ export const comments = pgTable("comments", {
     .default(0),
   userId: bigint("user_id", { mode: "number" })
     .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
+    .references(() => users.id, { onDelete: "cascade" }),
 });
 
 // 10. commentmeta[cite: 1]
@@ -243,10 +243,8 @@ export const links = pgTable("links", {
   linkRss: varchar("link_rss", { length: 255 }).notNull().default(""),
 });
 
-// --- Self-contained Schema Object & Relational Queries v2 API ---
-
 export const schema = {
-  user,
+  users,
   usermeta,
   posts,
   postmeta,

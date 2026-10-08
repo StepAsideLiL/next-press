@@ -4,30 +4,30 @@ import { schema } from "@/lib/db/schema";
 export const relations = defineRelations(schema, (r) => ({
   user: {
     usermeta: r.many.usermeta({
-      from: r.user.id,
+      from: r.users.id,
       to: r.usermeta.userId,
     }),
     posts: r.many.posts({
-      from: r.user.id,
+      from: r.users.id,
       to: r.posts.postAuthor,
     }),
     comments: r.many.comments({
-      from: r.user.id,
+      from: r.users.id,
       to: r.comments.userId,
     }),
   },
 
   usermeta: {
-    user: r.one.user({
+    user: r.one.users({
       from: r.usermeta.userId,
-      to: r.user.id,
+      to: r.users.id,
     }),
   },
 
   posts: {
-    author: r.one.user({
+    author: r.one.users({
       from: r.posts.postAuthor,
-      to: r.user.id,
+      to: r.users.id,
     }),
     postmeta: r.many.postmeta({
       from: r.posts.id,
@@ -99,9 +99,9 @@ export const relations = defineRelations(schema, (r) => ({
       from: r.comments.commentPostId,
       to: r.posts.id,
     }),
-    user: r.one.user({
+    user: r.one.users({
       from: r.comments.userId,
-      to: r.user.id,
+      to: r.users.id,
     }),
     commentmeta: r.many.commentmeta({
       from: r.comments.commentId,
